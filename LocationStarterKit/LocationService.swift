@@ -10,25 +10,27 @@ import UIKit
 import CoreLocation
 
 public class LocationService: NSObject, CLLocationManagerDelegate{
-    
+    var resetKalmanFilter: Bool = false
+    var hcKalmanFilter: HCKalmanAlgorithm?
+
     public static var sharedInstance = LocationService()
     let locationManager: CLLocationManager
-    var locationDataArray: [CLLocation]
-    var useFilter: Bool
-    
-    
+    var locationRawDataArray: [CLLocation]
+    var locationFilteredDataArray: [CLLocation]
+    var LocationKalmanDataArray: [CLLocation]
+
     override init() {
         locationManager = CLLocationManager()
         
         locationManager.desiredAccuracy = kCLLocationAccuracyBestForNavigation
-        locationManager.distanceFilter = 5
+        locationManager.distanceFilter = 0
         
         locationManager.requestWhenInUseAuthorization()
         locationManager.allowsBackgroundLocationUpdates = true
         locationManager.pausesLocationUpdatesAutomatically = false
-        locationDataArray = [CLLocation]()
-        
-        useFilter = true
+        locationRawDataArray = [CLLocation]()
+        locationFilteredDataArray = [CLLocation]()
+        LocationKalmanDataArray = [CLLocation]()
         
         super.init()
         
@@ -51,24 +53,30 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
     //MARK: CLLocationManagerDelegate protocol methods
     public func locationManager(_ manager: CLLocationManager,
                                   didUpdateLocations locations: [CLLocation]){
+        var kalmanFilteredLast: CLLocation?
+        for newLocation in locations {
+            locationRawDataArray.append(newLocation)
+            if filterAndAddLocation(newLocation) {
+                locationFilteredDataArray.append(newLocation)
+                if hcKalmanFilter == nil {
+                    print("kalman: inited")
+                    hcKalmanFilter = HCKalmanAlgorithm(initialLocation: newLocation)
+                } else {
+                    let kalmanLocation = hcKalmanFilter!.processState(currentLocation: newLocation)
+                    print("kalman:", kalmanLocation)
+                    kalmanFilteredLast = kalmanLocation
+                    LocationKalmanDataArray.append(kalmanLocation)
+                    print(kalmanLocation)
+                }
+            }
+        }
+        if let lastLocation = locations.last {
+            notifiyDidUpdateLocation(newLocation: lastLocation)
+        }
         
-        if let newLocation = locations.last{
-            print("(\(newLocation.coordinate.latitude), \(newLocation.coordinate.latitude))")
-            
-            var locationAdded: Bool
-            if useFilter{
-                locationAdded = filterAndAddLocation(newLocation)
-            }else{
-                locationDataArray.append(newLocation)
-                locationAdded = true
-            }
-            
-            
-            if locationAdded{
-                notifiyDidUpdateLocation(newLocation: newLocation)
-            }
-            
-        }        
+        if let kaledLocation = kalmanFilteredLast {
+            notifiyDidUpdateKalmanLocation(newLocation: kaledLocation)
+        }
     }
     
     func filterAndAddLocation(_ location: CLLocation) -> Bool{
@@ -79,19 +87,17 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
             return false
         }
         
-        if location.horizontalAccuracy < 0{
+        if location.horizontalAccuracy < 0 {
             print("Latitidue and longitude values are invalid.")
             return false
         }
         
-        if location.horizontalAccuracy > 100{
+        if location.horizontalAccuracy > 50 {
             print("Accuracy is too low.")
             return false
         }
         
         print("Location quality is good enough.")
-        locationDataArray.append(location)
-        
         return true
         
     }
@@ -118,6 +124,10 @@ public class LocationService: NSObject, CLLocationManagerDelegate{
     
     func notifiyDidUpdateLocation(newLocation:CLLocation){
         NotificationCenter.default.post(name: Notification.Name(rawValue:"didUpdateLocation"), object: nil, userInfo: ["location" : newLocation])        
+    }
+    
+    func notifiyDidUpdateKalmanLocation(newLocation:CLLocation){
+        NotificationCenter.default.post(name: Notification.Name(rawValue:"didUpdateKalmanLocation"), object: nil, userInfo: ["location" : newLocation])
     }
 }
 
