@@ -94,8 +94,9 @@ class GradientMKPolylineRenderer: MKPolylineRenderer {
 
     let baseWidth: CGFloat = self.lineWidth / zoomScale
 
+    // Draw border
     if self.showsBorder {
-      context.setLineWidth(baseWidth * 2)
+      context.setLineWidth(baseWidth * 1.5)
       context.setLineJoin(CGLineJoin.round)
       context.setLineCap(CGLineCap.round)
       context.addPath(self.path)
@@ -103,43 +104,28 @@ class GradientMKPolylineRenderer: MKPolylineRenderer {
       context.strokePath()
     }
 
-    /*
-         Define path properties and add it to context
-         */
-
-    /*
-         Replace path with stroked version so we can clip
-         */
-    context.saveGState()
-
+    // draw basic line
     context.setLineWidth(baseWidth)
     context.setLineJoin(CGLineJoin.round)
     context.setLineCap(CGLineCap.round)
+    context.addPath(self.path)
+    // clip to render color
+    context.saveGState()
+    context.replacePathWithStrokedPath()
+    context.clip()
 
+    // render speed gradient color
     let gradientPolyline = polyline as! GradientPolyline
-
-    for index in 1...self.polyline.pointCount - 1 {
-      let currentPoint = self.point(for: self.polyline.points()[index])
-      let prevPoint = self.point(for: self.polyline.points()[index - 1])
+    for index in 1...gradientPolyline.pointCount - 1 {
+      let currentPoint = self.point(for: gradientPolyline.points()[index])
+      let prevPoint = self.point(for: gradientPolyline.points()[index - 1])
       let currentColor = gradientPolyline.getHue(from: index)
       let prevColor = gradientPolyline.getHue(from: index - 1)
-      let path = CGMutablePath()
-
-      path.move(to: prevPoint)
-      path.addLine(to: currentPoint)
-
       let colors = [prevColor, currentColor] as CFArray
-
-      context.saveGState()
-      context.addPath(path)
-
       let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: [0, 1])
-
-      context.replacePathWithStrokedPath()
-      context.clip()
       context.drawLinearGradient(gradient!, start: prevPoint, end: currentPoint, options: [])
-      context.restoreGState()
     }
+    context.restoreGState()
   }
 
   /*
@@ -200,8 +186,8 @@ class ViewController: UIViewController, MKMapViewDelegate {
       name: Notification.Name(rawValue: "didUpdateLocation"), object: nil)
 
     NotificationCenter.default.addObserver(
-      self, selector: #selector(updateFilteredSpeed(notification:)),
-      name: Notification.Name(rawValue: "didUpdateFilteredLocation"), object: nil)
+      self, selector: #selector(updateKalmanSpeed(notification:)),
+      name: Notification.Name(rawValue: "didUpdateKalmanLocation"), object: nil)
 
     NotificationCenter.default.addObserver(
       self, selector: #selector(showTurnOnLocationServiceAlert(notification:)),
@@ -253,7 +239,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
   }
 
-  @objc func updateFilteredSpeed(notification: NSNotification) {
+  @objc func updateKalmanSpeed(notification: NSNotification) {
     if let userInfo = notification.userInfo {
       if let newLocation = userInfo["location"] as? CLLocation {
         if newLocation.speed > 0 {
@@ -261,9 +247,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
         } else {
           filteredSpeedLable.text = String(format: "0 km/h")
         }
-
       }
-
     }
   }
 
@@ -307,7 +291,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
   func updatePolylines() {
     var locations: [CLLocation]?
     if kalmanEnabled {
-        locations = LocationService.sharedInstance.locationFilteredDataArray
+      locations = LocationService.sharedInstance.LocationKalmanDataArray
     } else if filterEnabled {
       locations = LocationService.sharedInstance.locationFilteredDataArray
     } else {
@@ -315,7 +299,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     self.clearPolyline()
 
-    let route = GradientPolyline(locations: locations!, v_min: 7.0, v_max: 12.0)
+    let route = GradientPolyline(locations: locations!, v_min: 7.0, v_max: 14.0)
     self.polyline = route
     self.mapView.addOverlay(route)
   }

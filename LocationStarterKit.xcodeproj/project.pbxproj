@@ -15,8 +15,6 @@
 		4AA3C5DD1D5E110100A37641 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 4AA3C5DC1D5E110100A37641 /* Assets.xcassets */; };
 		4AA3C5E01D5E110100A37641 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 4AA3C5DE1D5E110100A37641 /* LaunchScreen.storyboard */; };
 		4AA3C5EB1D5E114000A37641 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4AA3C5EA1D5E114000A37641 /* LocationService.swift */; };
-		AA5A94B7283E4C2F0071D8D2 /* KalmanFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5A94B6283E4C2F0071D8D2 /* KalmanFilter.swift */; };
-		AA5A94B9283E6B130071D8D2 /* HCMatrix.swift in Sources */ = {isa = PBXBuildFile; fileRef = AA5A94B8283E6B130071D8D2 /* HCMatrix.swift */; };
 		AA5A94BC283E6B840071D8D2 /* Surge in Frameworks */ = {isa = PBXBuildFile; productRef = AA5A94BB283E6B840071D8D2 /* Surge */; };
 		AA5A94BD283E73710071D8D2 /* CoreLocation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AA3C5E81D5E110E00A37641 /* CoreLocation.framework */; };
 		AA5A94C0283E73730071D8D2 /* MapKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 4AB34C311D752BB500B31F24 /* MapKit.framework */; };
@@ -35,8 +33,6 @@
 		4AA3C5E81D5E110E00A37641 /* CoreLocation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = CoreLocation.framework; path = System/Library/Frameworks/CoreLocation.framework; sourceTree = SDKROOT; };
 		4AA3C5EA1D5E114000A37641 /* LocationService.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		4AB34C311D752BB500B31F24 /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
-		AA5A94B6283E4C2F0071D8D2 /* KalmanFilter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KalmanFilter.swift; sourceTree = "<group>"; };
-		AA5A94B8283E6B130071D8D2 /* HCMatrix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HCMatrix.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -80,9 +76,7 @@
 				4AA3C5DE1D5E110100A37641 /* LaunchScreen.storyboard */,
 				4AA3C5E11D5E110100A37641 /* Info.plist */,
 				4AA3C5EA1D5E114000A37641 /* LocationService.swift */,
-				AA5A94B6283E4C2F0071D8D2 /* KalmanFilter.swift */,
 				4A4D6F911D75166900329769 /* UserAnnotation.swift */,
-				AA5A94B8283E6B130071D8D2 /* HCMatrix.swift */,
 				4A4D6F931D7520B900329769 /* UIColor+Hex.swift */,
 			);
 			path = LocationStarterKit;
@@ -186,8 +180,6 @@
 				4AA3C5D81D5E110100A37641 /* ViewController.swift in Sources */,
 				4AA3C5EB1D5E114000A37641 /* LocationService.swift in Sources */,
 				4AA3C5D61D5E110100A37641 /* AppDelegate.swift in Sources */,
-				AA5A94B7283E4C2F0071D8D2 /* KalmanFilter.swift in Sources */,
-				AA5A94B9283E6B130071D8D2 /* HCMatrix.swift in Sources */,
 				4A4D6F921D75166900329769 /* UserAnnotation.swift in Sources */,
 				4A4D6F941D7520B900329769 /* UIColor+Hex.swift in Sources */,
 			);
@@ -267,7 +259,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
@@ -323,7 +315,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				IPHONEOS_DEPLOYMENT_TARGET = 13.5;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
 				SWIFT_COMPILATION_MODE = wholemodule;
@@ -341,7 +333,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4W852CXBUN;
 				INFOPLIST_FILE = LocationStarterKit/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -362,7 +354,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 4W852CXBUN;
 				INFOPLIST_FILE = LocationStarterKit/Info.plist;
-				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
