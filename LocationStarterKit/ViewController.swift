@@ -64,8 +64,6 @@ extension GradientPolyline {
 }
 
 class GradientMKPolylineRenderer: MKPolylineRenderer {
-
-  var gragientPolylines: GradientPolyline
   /// If a border should be rendered to make the line more visible
   var showsBorder: Bool = false
   /// The color of tne border, if showsBorder is true
@@ -79,18 +77,18 @@ class GradientMKPolylineRenderer: MKPolylineRenderer {
   init(polyline: GradientPolyline, showsBorder: Bool, borderColor: CGColor) {
     self.showsBorder = showsBorder
     self.borderColor = borderColor
-    self.gragientPolylines = polyline
     super.init(overlay: polyline)
   }
 
   init(polyline: GradientPolyline) {
-    self.gragientPolylines = polyline
     super.init(overlay: polyline)
   }
 
   override func draw(_ mapRect: MKMapRect, zoomScale: MKZoomScale, in context: CGContext) {
     if !mapRect.intersects(self.polyline.boundingMapRect) {
       print("not intersecting, skipp")
+      return
+    } else if polyline.pointCount < 2 {
       return
     }
 
@@ -105,8 +103,6 @@ class GradientMKPolylineRenderer: MKPolylineRenderer {
       context.strokePath()
     }
 
-    let colorspace = CGColorSpaceCreateDeviceRGB()
-
     /*
          Define path properties and add it to context
          */
@@ -119,39 +115,33 @@ class GradientMKPolylineRenderer: MKPolylineRenderer {
     context.replacePathWithStrokedPath()
     context.clip()
 
-    var prevColor: CGColor?
-    var currentColor: CGColor?
+    let gradientPolyline = polyline as! GradientPolyline
 
-    for index in 0...self.polyline.pointCount - 1 {
-      let point = self.point(for: self.polyline.points()[index])
+    for index in 1...self.polyline.pointCount - 1 {
+      let currentPoint = self.point(for: self.polyline.points()[index])
+      let prevPoint = self.point(for: self.polyline.points()[index - 1])
+      let currentColor = gradientPolyline.getHue(from: index)
+      let prevColor = gradientPolyline.getHue(from: index - 1)
       let path = CGMutablePath()
 
-      currentColor = gragientPolylines.getHue(from: index)
+      path.move(to: prevPoint)
+      path.addLine(to: currentPoint)
 
-      if index == 0 {
-        path.move(to: point)
-      } else {
-        let prevPoint = self.point(for: self.polyline.points()[index - 1])
-        path.move(to: prevPoint)
-        path.addLine(to: point)
+      let colors = [prevColor, currentColor] as CFArray
 
-        let colors = [prevColor!, currentColor!] as CFArray
+      context.saveGState()
+      context.addPath(path)
 
-        context.saveGState()
-        context.addPath(path)
+      let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: [0, 1])
 
-        let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: [0, 1])
+      context.setLineWidth(baseWidth)
+      context.setLineJoin(CGLineJoin.round)
+      context.setLineCap(CGLineCap.round)
 
-        context.setLineWidth(baseWidth)
-        context.setLineJoin(CGLineJoin.round)
-        context.setLineCap(CGLineCap.round)
-
-        context.replacePathWithStrokedPath()
-        context.clip()
-        context.drawLinearGradient(gradient!, start: prevPoint, end: point, options: [])
-        context.restoreGState()
-      }
-      prevColor = currentColor
+      context.replacePathWithStrokedPath()
+      context.clip()
+      context.drawLinearGradient(gradient!, start: prevPoint, end: currentPoint, options: [])
+      context.restoreGState()
     }
   }
 
@@ -328,7 +318,7 @@ class ViewController: UIViewController, MKMapViewDelegate {
     }
     self.clearPolyline()
 
-    let route = GradientPolyline(locations: locations!,v_min: 7.0,v_max: 14.0)
+    let route = GradientPolyline(locations: locations!, v_min: 7.0, v_max: 14.0)
     self.polyline = route
     self.mapView.addOverlay(route)
   }
