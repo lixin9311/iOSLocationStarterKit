@@ -121,12 +121,23 @@ public class LocationService: NSObject, CLLocationManagerDelegate {
           lastKnownVal: lastSpeed, lastKownTimestamp: newLocation.timestamp)
         let filteredSpeed = prediction.predictedVal
         let predictionTimestamp = prediction.prediectionTimestamp
-        let filteredLocation = CLLocation(
-          coordinate: newLocation.coordinate, altitude: newLocation.altitude,
-          horizontalAccuracy: newLocation.horizontalAccuracy,
-          verticalAccuracy: newLocation.verticalAccuracy, course: newLocation.speed,
-          courseAccuracy: newLocation.courseAccuracy, speed: filteredSpeed,
-          speedAccuracy: newLocation.speedAccuracy, timestamp: predictionTimestamp)
+        var filteredLocation: CLLocation
+        if let sourceInfo = newLocation.sourceInformation {
+          filteredLocation = CLLocation(
+            coordinate: newLocation.coordinate, altitude: newLocation.altitude,
+            horizontalAccuracy: newLocation.horizontalAccuracy,
+            verticalAccuracy: newLocation.verticalAccuracy, course: newLocation.speed,
+            courseAccuracy: newLocation.courseAccuracy, speed: filteredSpeed,
+            speedAccuracy: newLocation.speedAccuracy, timestamp: predictionTimestamp,
+            sourceInfo: sourceInfo)
+        } else {
+          filteredLocation = CLLocation(
+            coordinate: newLocation.coordinate, altitude: newLocation.altitude,
+            horizontalAccuracy: newLocation.horizontalAccuracy,
+            verticalAccuracy: newLocation.verticalAccuracy, course: newLocation.speed,
+            courseAccuracy: newLocation.courseAccuracy, speed: filteredSpeed,
+            speedAccuracy: newLocation.speedAccuracy, timestamp: predictionTimestamp)
+        }
         locationFilteredDataArray.append(filteredLocation)
         self.notifyUpdateFilteredLocaiont(newLocation: filteredLocation)
       }
